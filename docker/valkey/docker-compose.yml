@@ -1,0 +1,22 @@
+services:
+  valkey:
+    image: docker.io/valkey/valkey:alpine
+    container_name: valkey-server
+    command: valkey-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    # environment:
+    volumes:
+      - valkey-data:/data
+
+  valkey-cli:
+    image: docker.io/valkey/valkey:alpine
+    container_name: valkey-cli
+    command: sleep infinity
+    depends_on:
+      - valkey
+    stdin_open: true
+    tty: true
+
+volumes:
+  valkey-data:
