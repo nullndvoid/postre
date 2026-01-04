@@ -1,0 +1,3 @@
+include:
+  - ../postgres/docker-compose.yml
+  - ../valkey/docker-compose.yml

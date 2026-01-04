@@ -7,6 +7,8 @@ with features like:
 * Simple file uploads and management.
 * Extended Markdown syntax with support for MathJax, uploaded files, image and video previews.
 * Patreon-only/gated posts/content for members-only.
+* Handy admin panel for administration
+* Built in view metrics, optional analytics with Umami.
 
 Sometimes you don't want to use something as heavy as Wordpress, nor do you want to handle various SSGs like Hugo,
 along with the inflexibility of normal Markdown.
@@ -30,6 +32,16 @@ Other runtime and development dependencies include
 ## Running
 
 I currently just have Valkey up and running with Docker Compose.
+
+Before running everything, ensure you have set the following environment variables in `.env`.
+
+* `POSTGRES_PASSWORD`
+* `POSTGRES_READONLY_PASSWORD`
+
+```sh
+POSTGRES_PASSWORD=example_password
+POSTGRES_READONLY_PASSWORD=${POSTGRES_PASSWORD}
+```
 
 ```sh
 docker compose -f docker/valkey/docker-compose.yml up

@@ -1,0 +1,18 @@
+include:
+  - db/docker-compose.yml
+
+services:
+  app:
+    build:
+      dockerfile: docker/Dockerfile.dev
+      context: .. # Working from root directory.
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ..:/app
+      - /app/node_modules  # Preserve container's node_modules.
+    depends_on:
+      - db
+      - valkey

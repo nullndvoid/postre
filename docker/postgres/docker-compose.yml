@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose.
+    shm_size: 128mb
+    env_file:
+      - path: ../../.env
+        required: true
+    environment:
+      - POSTGRES_DB=postre_data
+      # This will be used for write-access to the DB.
+      - POSTGRES_USER=postre_admin
+      # POSTGRES_PASSWORD should be set in the envvars/.env file.
+      # You should also override the readonly password in .env.
+      # - POSTGRES_READONLY_PASSWORD=passwd
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./create-readonly-user.sh:/docker-entrypoint-initdb.d/create-readonly-user.sh
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+volumes:
+  postgres_data:
