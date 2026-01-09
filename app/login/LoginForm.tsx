@@ -4,36 +4,13 @@ import { Button } from "@headlessui/react";
 import { useActionState } from "react";
 
 import FormField, { FormFieldProps } from "@/app/components/FormField";
-import { loginUser } from "@/app/actions";
-
-const initialState: {
-  email: string;
-  password: string;
-  errors: string[];
-  message: string;
-} = {
-  email: "",
-  password: "",
-  errors: [],
-  message: "",
-};
+import { loginUser } from "@/app/actions/auth";
 
 export default function LoginForm({ fields }: { fields: FormFieldProps[] }) {
-  const [state, formAction, pending] = useActionState(loginUser, initialState);
+  const [state, formAction, pending] = useActionState(loginUser, undefined);
 
   return (
     <form className="flex gap-8 flex-col" action={formAction}>
-      {/* Display field-specific errors */}
-      {state && state.errors && state.errors.length > 0 && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-          <ul className="text-sm space-y-1">
-            {state.errors.map((error, index) => (
-              <li key={index}>• {error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       {fields.map((field) => (
         <FormField
           key={field.name}
@@ -43,6 +20,7 @@ export default function LoginForm({ fields }: { fields: FormFieldProps[] }) {
           description={field.description}
           borderColour="blue"
           required={field.required}
+          errors={state?.errors?.[field.name as keyof typeof state.errors]}
         />
       ))}
       <Button

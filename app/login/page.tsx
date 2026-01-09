@@ -1,5 +1,5 @@
-import { FormFieldProps } from "./components/FormField";
-import LoginForm from "./login/LoginForm";
+import { FormFieldProps } from "@/app/components/FormField";
+import LoginForm from "@/app/login/LoginForm";
 
 export default function Home() {
   const fields: FormFieldProps[] = [

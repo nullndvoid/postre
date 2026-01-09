@@ -7,6 +7,7 @@ export interface FormFieldProps {
   description: string;
   borderColour?: "blue" | "orange" | "pink" | "green" | "red";
   required: boolean;
+  errors?: string[];
 }
 
 const borderColorMap = {
@@ -24,6 +25,7 @@ export default function FormField({
   description,
   borderColour = "orange",
   required = false,
+  errors = [],
 }: FormFieldProps) {
   const borderColorClass = borderColorMap[borderColour];
 
@@ -48,6 +50,13 @@ export default function FormField({
           </Description>
         </div>
       </div>
+      {errors.length > 0 && (
+        <ul>
+          {errors.map((e) => (
+            <li>{e}</li>
+          ))}
+        </ul>
+      )}
     </Field>
   );
 }

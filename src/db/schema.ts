@@ -11,6 +11,7 @@ import { defineRelations } from "drizzle-orm";
 export const AuthorsTable = pgTable("authors", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   username: varchar({ length: 255 }).notNull().unique(),
+  display_name: varchar({ length: 128 }).notNull(),
   profile_picture: uuid().references(() => ContentTable.id, {
     onDelete: "set null",
   }),
