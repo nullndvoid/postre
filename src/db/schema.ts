@@ -11,7 +11,9 @@ import { defineRelations } from "drizzle-orm";
 export const authors = pgTable("authors", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   username: varchar({ length: 255 }).notNull().unique(),
-  profile_picture: uuid().references(() => content.id),
+  profile_picture: uuid().references(() => content.id, {
+    onDelete: "set null",
+  }),
   // ADM is the only supported role at this time.
   role: varchar({ length: 3 }),
   created_at: timestamp().defaultNow().notNull(),
@@ -28,7 +30,7 @@ export const posts = pgTable("posts", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar(),
   body: text(),
-  author_id: integer().references(() => authors.id),
+  author_id: integer().references(() => authors.id, { onDelete: "cascade" }),
   status: varchar().notNull(),
   created_at: timestamp().defaultNow().notNull(),
   slug: varchar().notNull(),
@@ -37,11 +39,10 @@ export const posts = pgTable("posts", {
 
 export const relations = defineRelations({ authors, posts, content }, (r) => ({
   authors: {
-    profile_picture: r.one.content({
+    pfp: r.one.content({
       from: r.authors.profile_picture,
       to: r.content.id,
       optional: true,
-      alias: "pfp",
     }),
   },
   posts: {
