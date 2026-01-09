@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
 
 import { LoginUserSchema, LoginFormState } from "@/app/lib/auth/definitions";
-import z from "zod";
 
 async function getIronSessionData() {
   const session = await getIronSession(await cookies(), {
@@ -27,6 +26,7 @@ export async function loginUser(
   if (!validatedFields.success) {
     const fieldErrors: { email?: string[]; password?: string[] } = {};
 
+    // TODO: Write some utility function to perform this mapping.
     validatedFields.error.issues.forEach((issue) => {
       const field = issue.path[0] as "email" | "password";
       if (!fieldErrors[field]) {
