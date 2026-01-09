@@ -3,24 +3,38 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start",
-    "lint": "eslint"
+    "dev": "dotenvx run -- bun --bun next dev",
+    "build": "dotenvx run -- bun --bun next build",
+    "start": "dotenvx run -- bun --bun next start",
+    "lint": "eslint",
+    "db:generate": "dotenvx run -- drizzle-kit generate",
+    "db:migrate": "dotenvx run -- drizzle-kit migrate",
+    "db:push": "dotenvx run -- drizzle-kit push",
+    "db:studio": "dotenvx run -- drizzle-kit studio"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^1.0.0-beta.9-e89174b",
     "next": "16.1.1",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.8",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.51.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^1.0.0-beta.9-e89174b",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   },
   "ignoreScripts": [
@@ -28,6 +42,7 @@
     "unrs-resolver"
   ],
   "trustedDependencies": [
+    "esbuild",
     "sharp",
     "unrs-resolver"
   ]

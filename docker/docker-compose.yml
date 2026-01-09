@@ -1,0 +1,19 @@
+# Production Docker compose file.
+include:
+  - db/docker-compose.yml
+
+services:
+  app:
+    build:
+      dockerfile: docker/Dockerfile
+      context: .. # Working from root directory.
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ..:/app
+      - /app/node_modules  # Preserve container's node_modules.
+    depends_on:
+      - db
+      - valkey

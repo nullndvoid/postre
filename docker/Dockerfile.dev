@@ -1,9 +1,19 @@
-FROM node:24-alpine
+# Development Dockerfile for Bun + Next.js
+FROM oven/bun:1.3.5-alpine
+
 WORKDIR /app
 
-COPY package*.json /app/
-RUN npm install
+# Copy package files
+COPY package.json bun.lock* ./
 
+# Install dependencies (including dev dependencies for development).
+RUN bun install --frozen-lockfile
+
+# Copy source code
 COPY . .
+
+# Expose Next.js development port
 EXPOSE 3000
-ENTRYPOINT ["npm", "run", "dev"]
+
+# Start development server
+CMD ["bun", "run", "dev"]

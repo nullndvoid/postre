@@ -17,6 +17,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
       - ./create-readonly-user.sh:/docker-entrypoint-initdb.d/create-readonly-user.sh
+    ports:
+      - 5432:5432
   adminer:
     image: adminer
     restart: always

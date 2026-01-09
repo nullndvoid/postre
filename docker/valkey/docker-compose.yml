@@ -9,14 +9,5 @@ services:
     volumes:
       - valkey-data:/data
 
-  valkey-cli:
-    image: docker.io/valkey/valkey:alpine
-    container_name: valkey-cli
-    command: sleep infinity
-    depends_on:
-      - valkey
-    stdin_open: true
-    tty: true
-
 volumes:
   valkey-data:
