@@ -15,10 +15,9 @@ export const AuthorsTable = pgTable("authors", {
   profile_picture: uuid().references(() => ContentTable.id, {
     onDelete: "set null",
   }),
-  // ADM is the only supported role at this time.
-  role: varchar({ length: 3 }),
+  role: integer().notNull(),
   created_at: timestamp().defaultNow().notNull(),
-  password_hash: varchar({ length: 255 }),
+  password_hash: varchar({ length: 255 }).notNull(),
 });
 
 export const ContentTable = pgTable("content", {

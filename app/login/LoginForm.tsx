@@ -11,6 +11,7 @@ export default function LoginForm({ fields }: { fields: FormFieldProps[] }) {
 
   return (
     <form className="flex gap-8 flex-col" action={formAction}>
+      {state && state.message && <p className="text-md ">{state.message}</p>}
       {fields.map((field) => (
         <FormField
           key={field.name}

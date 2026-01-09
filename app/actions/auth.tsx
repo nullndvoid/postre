@@ -1,18 +1,10 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { getIronSession } from "iron-session";
-
 import { LoginUserSchema, LoginFormState } from "@/app/lib/auth/definitions";
-
-async function getIronSessionData() {
-  const session = await getIronSession(await cookies(), {
-    password: process.env.IRON_SESSION_SECRET!,
-    cookieName: "__irn_session",
-  });
-
-  return session;
-}
+import { getAuthorByUsername } from "@/app/data/author-repository";
+import { createSession } from "@/app/lib/auth/session";
+import { AuthorRole } from "@/app/data/author-dto";
+import { redirect } from "next/navigation";
 
 export async function loginUser(
   _: LoginFormState,
@@ -41,5 +33,29 @@ export async function loginUser(
   }
 
   // TODO: Check the login and return a session!
-  return {};
+  const author = await getAuthorByUsername(validatedFields.data.email);
+
+  if (author == null) {
+    // Return an error message that the user does not exist!
+    return {
+      message: "User does not exist or password was incorrect.",
+    };
+  }
+
+  // Hash password with Argon2i.
+  try {
+    await Bun.password.verify(
+      validatedFields.data.password,
+      author.password_hash
+    );
+  } catch {
+    return {
+      message: "User does not exist or password was incorrect.",
+    };
+  }
+
+  // Now just return a session and redirect to /.
+  await createSession(author.id, author.role as AuthorRole);
+
+  redirect("/");
 }
