@@ -8,10 +8,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { defineRelations } from "drizzle-orm";
 
-export const authors = pgTable("authors", {
+export const AuthorsTable = pgTable("authors", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   username: varchar({ length: 255 }).notNull().unique(),
-  profile_picture: uuid().references(() => content.id, {
+  profile_picture: uuid().references(() => ContentTable.id, {
     onDelete: "set null",
   }),
   // ADM is the only supported role at this time.
@@ -20,36 +20,41 @@ export const authors = pgTable("authors", {
   password_hash: varchar({ length: 255 }),
 });
 
-export const content = pgTable("content", {
+export const ContentTable = pgTable("content", {
   id: uuid().primaryKey(),
   filename: varchar().notNull(),
   mimetype: varchar().notNull(),
 });
 
-export const posts = pgTable("posts", {
+export const PostsTable = pgTable("posts", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar(),
   body: text(),
-  author_id: integer().references(() => authors.id, { onDelete: "cascade" }),
+  author_id: integer().references(() => AuthorsTable.id, {
+    onDelete: "cascade",
+  }),
   status: varchar().notNull(),
   created_at: timestamp().defaultNow().notNull(),
   slug: varchar().notNull(),
   last_updated: timestamp(),
 });
 
-export const relations = defineRelations({ authors, posts, content }, (r) => ({
-  authors: {
-    pfp: r.one.content({
-      from: r.authors.profile_picture,
-      to: r.content.id,
-      optional: true,
-    }),
-  },
-  posts: {
-    author: r.one.authors({
-      from: r.posts.author_id,
-      to: r.authors.id,
-      optional: false,
-    }),
-  },
-}));
+export const relations = defineRelations(
+  { authors: AuthorsTable, posts: PostsTable, content: ContentTable },
+  (r) => ({
+    authors: {
+      pfp: r.one.content({
+        from: r.authors.profile_picture,
+        to: r.content.id,
+        optional: true,
+      }),
+    },
+    posts: {
+      author: r.one.authors({
+        from: r.posts.author_id,
+        to: r.authors.id,
+        optional: false,
+      }),
+    },
+  })
+);
