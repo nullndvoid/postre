@@ -44,10 +44,16 @@ export async function loginUser(
 
   // Hash password with Argon2i.
   try {
-    await Bun.password.verify(
+    const passwordValid = await Bun.password.verify(
       validatedFields.data.password,
       author.password_hash
     );
+
+    if (!passwordValid) {
+      return {
+        message: "User does not exist or password was incorrect.",
+      };
+    }
   } catch {
     return {
       message: "User does not exist or password was incorrect.",
