@@ -1,8 +1,12 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/bun-sql";
+import { drizzle } from "drizzle-orm/postgres-js";
 import { AuthorsTable, PostsTable, ContentTable } from "./db/schema";
+import postgres from "postgres";
 
-export const db = drizzle(process.env.DATABASE_URL!);
+const client = postgres(process.env.DATABASE_URL!);
+export const db = drizzle({
+  client: client,
+});
 
 export type Author = InferSelectModel<typeof AuthorsTable>;
 export type NewAuthor = InferInsertModel<typeof AuthorsTable>;
