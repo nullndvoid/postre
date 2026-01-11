@@ -1,75 +1,68 @@
 import { getValkeyClient } from "./valkey";
 
-const CONFIG_PREFIX = "cfg:";
+const CONFIG_KEY = "config";
 
-export interface ConfigValue {
-  [key: string]: string | number | boolean | object;
-}
-
-export async function getConfig(key: string): Promise<string | null> {
-  const client = await getValkeyClient();
-  return client.get(`${CONFIG_PREFIX}${key}`);
-}
-
-export async function setConfig(
-  key: string,
-  value: string | number | boolean | object
-): Promise<void> {
-  const client = await getValkeyClient();
-  const stringValue = typeof value === "string" ? value : JSON.stringify(value);
-  await client.set(`${CONFIG_PREFIX}${key}`, stringValue);
-}
-
-export async function getAllConfig(): Promise<Record<string, string>> {
-  const client = await getValkeyClient();
-  const keys = await client.keys(`${CONFIG_PREFIX}*`);
-
-  const config: Record<string, string> = {};
-  for (const key of keys) {
-    const value = await client.get(key);
-    if (value) {
-      config[key.replace(CONFIG_PREFIX, "")] = value;
-    }
-  }
-  return config;
-}
-
-export async function deleteConfig(key: string): Promise<void> {
-  const client = await getValkeyClient();
-  await client.del(`${CONFIG_PREFIX}${key}`);
-}
-
-export async function clearAllConfig(): Promise<void> {
-  const client = await getValkeyClient();
-  const keys = await client.keys(`${CONFIG_PREFIX}*`);
-  if (keys.length > 0) {
-    await client.del(keys);
-  }
-}
-
-export async function configExists(): Promise<boolean> {
-  const client = await getValkeyClient();
-  const keys = await client.keys(`${CONFIG_PREFIX}*`);
-  return keys.length > 0;
-}
-
-/** TODO: Patreon shit. */
-const Config: {
+export type Config = {
   captcha?: {
     service_api_key?: string;
   };
-  theme?: {
-    name?: string;
+  theme: {
+    name: string;
   };
-  comments?: {
-    allow?: boolean;
+  comments: {
+    allow: boolean;
     require_approval?: boolean;
     require_auth?: boolean;
-    /** This should be checked using Zod schema? */
-    auth_providers?: string[];
+    auth_providers?: AuthProviders[];
   };
   view?: {
     show_reading_time?: boolean;
     share_to?: string[];
   };
-} = {};
+  server_configured: boolean;
+};
+
+export enum AuthProviders {
+  None,
+  OAuth,
+}
+
+const defaultConfig: Config = {
+  server_configured: false,
+  comments: {
+    allow: false,
+    require_approval: false,
+    require_auth: false,
+    auth_providers: [AuthProviders.None],
+  },
+  theme: {
+    name: "default",
+  },
+  view: {
+    show_reading_time: true,
+    share_to: [],
+  },
+};
+
+export async function getConfig(): Promise<Config> {
+  const client = await getValkeyClient();
+  const raw = await client.get(CONFIG_KEY);
+
+  if (!raw) {
+    return defaultConfig;
+  }
+
+  return { ...defaultConfig, ...JSON.parse(raw) };
+}
+
+export async function setConfig(config: Partial<Config>): Promise<void> {
+  const client = await getValkeyClient();
+  const current = await getConfig();
+  const merged = { ...current, ...config };
+  await client.set(CONFIG_KEY, JSON.stringify(merged));
+}
+
+export async function resetConfig(): Promise<void> {
+  const client = await getValkeyClient();
+  await client.del(CONFIG_KEY);
+}
