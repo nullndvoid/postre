@@ -44,15 +44,15 @@ const defaultConfig: Config = {
   },
 };
 
-export async function getConfig(): Promise<Config> {
+export async function getConfig(): Promise<{ cfg: Config; exists: boolean }> {
   const client = await getValkeyClient();
   const raw = await client.get(CONFIG_KEY);
 
   if (!raw) {
-    return defaultConfig;
+    return { cfg: defaultConfig, exists: false };
   }
 
-  return { ...defaultConfig, ...JSON.parse(raw) };
+  return { cfg: { ...defaultConfig, ...JSON.parse(raw) }, exists: true };
 }
 
 export async function setConfig(config: Partial<Config>): Promise<void> {
@@ -60,6 +60,11 @@ export async function setConfig(config: Partial<Config>): Promise<void> {
   const current = await getConfig();
   const merged = { ...current, ...config };
   await client.set(CONFIG_KEY, JSON.stringify(merged));
+}
+
+export async function setDefaultConfig(): Promise<void> {
+  const client = await getValkeyClient();
+  await client.set(CONFIG_KEY, JSON.stringify(defaultConfig));
 }
 
 export async function resetConfig(): Promise<void> {
