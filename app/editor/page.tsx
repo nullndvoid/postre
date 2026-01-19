@@ -9,12 +9,13 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import Editor from "@monaco-editor/react";
 import { useRef, useState } from "react";
 
 export default function () {
   const monacoRef = useRef(null);
   const [htmlContent, setHtmlContent] = useState("");
+  const [editorContent, setEditorContent] = useState("");
+
   const [editorWidth, setEditorWidth] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -23,20 +24,26 @@ export default function () {
       .use(remarkParse)
       .use(remarkGfm)
       .use(remarkRehype)
+      .use(rehypeDocument)
       .use(rehypeSlug)
-      .use(rehypeAutolinkHeadings, {
-        properties: {
-          className: [""],
-        },
-        content: (node) => {
-          return {
-            type: "element",
-            tagName: "span",
-            properties: {},
-            children: [{ type: "text", value: "##" }],
-          };
-        },
-      })
+      .use(
+        rehypeAutolinkHeadings,
+        // {
+        //   properties: {
+        //     className: [""],
+        //   },
+        //   content: () => {
+        //     return {
+        //       type: "element",
+        //       tagName: "span",
+        //       properties: {
+        //         class: "text-gray-200",
+        //       },
+        //       children: [{ type: "text", value: "#" }],
+        //     };
+        //   },
+        // }
+      )
       .use(rehypeFormat)
       .use(rehypeStringify)
       .process(markdown);
@@ -45,7 +52,7 @@ export default function () {
   }
 
   function handleEditorChange(value: string | undefined) {
-    if (value) {
+    if (value !== undefined) {
       processMarkdown(value);
     }
   }
@@ -72,25 +79,41 @@ export default function () {
   }
 
   return (
-    <div ref={containerRef} className="flex mx-8 gap-0 my-4 h-screen">
-      <div style={{ width: `${editorWidth}%` }}>
-        <Editor
-          defaultLanguage="markdown"
-          height="90vh"
-          theme="vs-dark"
-          options={{ minimap: { enabled: false } }}
-          onChange={handleEditorChange}
+    <div className="flex items-center justify-center min-h-screen">
+      <div ref={containerRef} className="flex m-8 gap-4 h-[90vh] w-full">
+        <div style={{ width: `${editorWidth}%` }} className="flex flex-col">
+          <span className="font-mono text-xs text-gray-400 pt-4 pb-2">
+            EDITOR
+          </span>
+          <textarea
+            name="md-editor"
+            value={editorContent}
+            onChange={(e) => {
+              e.preventDefault();
+              setEditorContent(e.target.value);
+              handleEditorChange(e.target.value);
+            }}
+            className="flex-1 w-full p-4 bg-gray-900/50 text-white font-mono resize-none outline-none ring-0"
+          ></textarea>
+        </div>
+        <div
+          onMouseDown={handleMouseDown}
+          className="w-1 bg-gray-700 hover:bg-blue-500 cursor-col-resize transition-colors"
         />
-      </div>
-      <div
-        onMouseDown={handleMouseDown}
-        className="w-1 bg-gray-700 hover:bg-blue-500 cursor-col-resize transition-colors"
-      />
-      <div style={{ width: `${100 - editorWidth}%` }} className="overflow-auto">
-        <article
-          className="prose prose-slate prose-h1:text-md font-sans lg:prose-xl dark:prose-invert p-4"
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
-        />
+        <div
+          style={{ width: `${100 - editorWidth}%` }}
+          className="flex flex-col"
+        >
+          <span className="font-mono text-xs text-gray-400 px-4 pt-4 pb-2">
+            PREVIEW
+          </span>
+          <div className="flex-1 overflow-auto">
+            <article
+              className="prose-sm lg:prose-xl prose-slate font-sans dark:prose-invert p-4 prose-a:underline"
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
