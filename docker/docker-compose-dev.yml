@@ -3,6 +3,7 @@ include:
 
 services:
   app:
+    restart: no
     build:
       dockerfile: docker/Dockerfile.dev
       context: .. # Working from root directory.

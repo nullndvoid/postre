@@ -4,6 +4,7 @@ include:
 
 services:
   app:
+    restart: no
     build:
       dockerfile: docker/Dockerfile
       context: .. # Working from root directory.
