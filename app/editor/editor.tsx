@@ -43,7 +43,7 @@ export default function Editor({ postId }: { postId?: string }) {
   }
 
   return (
-    <div ref={containerRef} className="flex m-8 gap-4 h-[90vh] w-full">
+    <div ref={containerRef} className="flex gap-4 h-[90vh] w-full">
       <div style={{ width: `${editorWidth}%` }} className="flex flex-col">
         <span className="font-mono text-xs dark:text-gray-400 pt-4 pb-2">
           EDITOR
