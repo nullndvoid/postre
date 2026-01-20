@@ -80,7 +80,7 @@ export default function Editor({ postId }: { postId?: string }) {
 
 async function processMarkdown(
   markdown: string,
-  setHtmlContent: Dispatch<SetStateAction<string>>,
+  setHtmlContent: Dispatch<SetStateAction<string>>
 ): Promise<void> {
   const file = await unified()
     .use(remarkParse)
@@ -98,7 +98,7 @@ async function processMarkdown(
 
 function handleEditorChange(
   value: string | undefined,
-  setHtmlContent: Dispatch<SetStateAction<string>>,
+  setHtmlContent: Dispatch<SetStateAction<string>>
 ) {
   if (value !== undefined) {
     processMarkdown(value, setHtmlContent);
